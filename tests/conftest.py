@@ -91,15 +91,24 @@ def mock_vector_store(mock_qdrant_client, mock_embeddings):
 @pytest.fixture
 def mock_rag_chain():
     """Mock RAG chain."""
-    with patch("app.core.rag_chain.RAGChain") as mock:
+    with patch("app.api.routes.query.RAGChain") as mock:
         chain = MagicMock()
         chain.query.return_value = "This is a test answer."
-        chain.aquery.return_value = "This is a test answer."
+
+        # Use AsyncMock for async methods
+        async def mock_aquery(question):
+            return "This is a test answer."
+
+        async def mock_aquery_with_sources(question):
+            return {
+                "answer": "This is a test answer.",
+                "sources": [{"content": "Test content", "metadata": {"source": "test.pdf"}}],
+            }
+
+        chain.aquery = mock_aquery
+        chain.aquery_with_sources = mock_aquery_with_sources
+
         chain.query_with_sources.return_value = {
-            "answer": "This is a test answer.",
-            "sources": [{"content": "Test content", "metadata": {"source": "test.pdf"}}],
-        }
-        chain.aquery_with_sources.return_value = {
             "answer": "This is a test answer.",
             "sources": [{"content": "Test content", "metadata": {"source": "test.pdf"}}],
         }
@@ -110,27 +119,39 @@ def mock_rag_chain():
 @pytest.fixture
 def mock_rag_chain_with_evaluation():
     """Mock RAG chain with evaluation support."""
-    with patch("app.core.rag_chain.RAGChain") as mock:
+    with patch("app.api.routes.query.RAGChain") as mock:
         chain = MagicMock()
         chain.query.return_value = "This is a test answer."
-        chain.aquery.return_value = "This is a test answer."
+
+        # Use async functions for async methods
+        async def mock_aquery(question):
+            return "This is a test answer."
+
+        async def mock_aquery_with_sources(question):
+            return {
+                "answer": "This is a test answer.",
+                "sources": [{"content": "Test content", "metadata": {"source": "test.pdf"}}],
+            }
+
+        async def mock_aquery_with_evaluation(question, include_sources=True):
+            return {
+                "answer": "This is a test answer.",
+                "sources": [{"content": "Test content", "metadata": {"source": "test.pdf"}}],
+                "evaluation": {
+                    "faithfulness": 0.95,
+                    "answer_relevancy": 0.87,
+                    "evaluation_time_ms": 1200.5,
+                    "error": None,
+                },
+            }
+
+        chain.aquery = mock_aquery
+        chain.aquery_with_sources = mock_aquery_with_sources
+        chain.aquery_with_evaluation = mock_aquery_with_evaluation
+
         chain.query_with_sources.return_value = {
             "answer": "This is a test answer.",
             "sources": [{"content": "Test content", "metadata": {"source": "test.pdf"}}],
-        }
-        chain.aquery_with_sources.return_value = {
-            "answer": "This is a test answer.",
-            "sources": [{"content": "Test content", "metadata": {"source": "test.pdf"}}],
-        }
-        chain.aquery_with_evaluation.return_value = {
-            "answer": "This is a test answer.",
-            "sources": [{"content": "Test content", "metadata": {"source": "test.pdf"}}],
-            "evaluation": {
-                "faithfulness": 0.95,
-                "answer_relevancy": 0.87,
-                "evaluation_time_ms": 1200.5,
-                "error": None,
-            },
         }
         mock.return_value = chain
         yield chain
@@ -139,27 +160,39 @@ def mock_rag_chain_with_evaluation():
 @pytest.fixture
 def mock_rag_chain_with_evaluation_error():
     """Mock RAG chain with evaluation error."""
-    with patch("app.core.rag_chain.RAGChain") as mock:
+    with patch("app.api.routes.query.RAGChain") as mock:
         chain = MagicMock()
         chain.query.return_value = "This is a test answer."
-        chain.aquery.return_value = "This is a test answer."
+
+        # Use async functions for async methods
+        async def mock_aquery(question):
+            return "This is a test answer."
+
+        async def mock_aquery_with_sources(question):
+            return {
+                "answer": "This is a test answer.",
+                "sources": [{"content": "Test content", "metadata": {"source": "test.pdf"}}],
+            }
+
+        async def mock_aquery_with_evaluation(question, include_sources=True):
+            return {
+                "answer": "This is a test answer.",
+                "sources": [{"content": "Test content", "metadata": {"source": "test.pdf"}}],
+                "evaluation": {
+                    "faithfulness": None,
+                    "answer_relevancy": None,
+                    "evaluation_time_ms": None,
+                    "error": "Evaluation timeout after 30s",
+                },
+            }
+
+        chain.aquery = mock_aquery
+        chain.aquery_with_sources = mock_aquery_with_sources
+        chain.aquery_with_evaluation = mock_aquery_with_evaluation
+
         chain.query_with_sources.return_value = {
             "answer": "This is a test answer.",
             "sources": [{"content": "Test content", "metadata": {"source": "test.pdf"}}],
-        }
-        chain.aquery_with_sources.return_value = {
-            "answer": "This is a test answer.",
-            "sources": [{"content": "Test content", "metadata": {"source": "test.pdf"}}],
-        }
-        chain.aquery_with_evaluation.return_value = {
-            "answer": "This is a test answer.",
-            "sources": [{"content": "Test content", "metadata": {"source": "test.pdf"}}],
-            "evaluation": {
-                "faithfulness": None,
-                "answer_relevancy": None,
-                "evaluation_time_ms": None,
-                "error": "Evaluation timeout after 30s",
-            },
         }
         mock.return_value = chain
         yield chain
@@ -168,6 +201,24 @@ def mock_rag_chain_with_evaluation_error():
 @pytest.fixture
 def client(mock_vector_store, mock_rag_chain):
     """Create test client with mocked dependencies."""
+    from app.main import app
+
+    with TestClient(app) as test_client:
+        yield test_client
+
+
+@pytest.fixture
+def client_with_evaluation(mock_vector_store, mock_rag_chain_with_evaluation):
+    """Create test client with evaluation mock."""
+    from app.main import app
+
+    with TestClient(app) as test_client:
+        yield test_client
+
+
+@pytest.fixture
+def client_with_evaluation_error(mock_vector_store, mock_rag_chain_with_evaluation_error):
+    """Create test client with evaluation error mock."""
     from app.main import app
 
     with TestClient(app) as test_client:

@@ -70,7 +70,7 @@ class TestQueryEndpoints:
         # Should return validation error
         assert response.status_code == 422
 
-    def test_query_with_evaluation_enabled(self, client, mock_rag_chain_with_evaluation):
+    def test_query_with_evaluation_enabled(self, client_with_evaluation):
         """Test query with evaluation enabled."""
         request_data = {
             "question": "What is RAG?",
@@ -78,7 +78,7 @@ class TestQueryEndpoints:
             "enable_evaluation": True,
         }
 
-        response = client.post("/query", json=request_data)
+        response = client_with_evaluation.post("/query", json=request_data)
 
         assert response.status_code == 200
         data = response.json()
@@ -106,7 +106,7 @@ class TestQueryEndpoints:
         assert "evaluation" in data
         assert data["evaluation"] is None
 
-    def test_query_evaluation_scores_in_response(self, client, mock_rag_chain_with_evaluation):
+    def test_query_evaluation_scores_in_response(self, client_with_evaluation):
         """Test that evaluation scores are properly formatted in response."""
         request_data = {
             "question": "Explain vector databases",
@@ -114,7 +114,7 @@ class TestQueryEndpoints:
             "enable_evaluation": True,
         }
 
-        response = client.post("/query", json=request_data)
+        response = client_with_evaluation.post("/query", json=request_data)
 
         assert response.status_code == 200
         data = response.json()
@@ -128,7 +128,7 @@ class TestQueryEndpoints:
         assert "evaluation_time_ms" in evaluation
         assert evaluation["error"] is None
 
-    def test_query_with_evaluation_error(self, client, mock_rag_chain_with_evaluation_error):
+    def test_query_with_evaluation_error(self, client_with_evaluation_error):
         """Test graceful degradation when evaluation fails."""
         request_data = {
             "question": "What is RAG?",
@@ -136,7 +136,7 @@ class TestQueryEndpoints:
             "enable_evaluation": True,
         }
 
-        response = client.post("/query", json=request_data)
+        response = client_with_evaluation_error.post("/query", json=request_data)
 
         assert response.status_code == 200
         data = response.json()
@@ -153,30 +153,27 @@ class TestQueryEndpoints:
 
     def test_search_documents(self, client, mock_vector_store):
         """Test document search endpoint."""
+        from langchain_core.documents import Document
+
+        # Configure mock to return search results
+        mock_vector_store.search_with_scores.return_value = [
+            (
+                Document(
+                    page_content="RAG content",
+                    metadata={"source": "test.txt"},
+                ),
+                0.95,
+            )
+        ]
+
         request_data = {"question": "RAG pipeline"}
+        response = client.post("/query/search", json=request_data)
 
-        with patch("app.api.routes.query.VectorStoreService") as mock_vs:
-            from langchain_core.documents import Document
-
-            mock_instance = MagicMock()
-            mock_instance.search_with_scores.return_value = [
-                (
-                    Document(
-                        page_content="RAG content",
-                        metadata={"source": "test.txt"},
-                    ),
-                    0.95,
-                )
-            ]
-            mock_vs.return_value = mock_instance
-
-            response = client.post("/query/search", json=request_data)
-
-            assert response.status_code == 200
-            data = response.json()
-            assert "query" in data
-            assert "results" in data
-            assert "count" in data
+        assert response.status_code == 200
+        data = response.json()
+        assert "query" in data
+        assert "results" in data
+        assert "count" in data
 
 
 class TestQueryValidation:

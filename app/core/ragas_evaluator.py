@@ -13,7 +13,6 @@ from app.config import get_settings
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
-settings = get_settings()
 
 
 class RAGASEvaluator:
@@ -23,26 +22,29 @@ class RAGASEvaluator:
         """Initialize RAGAS evaluator with metrics and models."""
         logger.info("Initializing RAGAS evaluator")
 
+        # Get settings inside __init__ to allow mocking in tests
+        self.settings = get_settings()
+
         # Use RAGAS-specific LLM settings if provided, otherwise fall back to default
-        eval_llm_model = settings.ragas_llm_model or settings.llm_model
+        eval_llm_model = self.settings.ragas_llm_model or self.settings.llm_model
         eval_llm_temperature = (
-            settings.ragas_llm_temperature
-            if settings.ragas_llm_temperature is not None
-            else settings.llm_temperature
+            self.settings.ragas_llm_temperature
+            if self.settings.ragas_llm_temperature is not None
+            else self.settings.llm_temperature
         )
-        eval_embedding_model = settings.ragas_embedding_model or settings.embedding_model
+        eval_embedding_model = self.settings.ragas_embedding_model or self.settings.embedding_model
 
         # Initialize LLM for evaluation
         self.llm = ChatOpenAI(
             model=eval_llm_model,
             temperature=eval_llm_temperature,
-            openai_api_key=settings.openai_api_key,
+            openai_api_key=self.settings.openai_api_key,
         )
 
         # Initialize embeddings for evaluation
         self.embeddings = OpenAIEmbeddings(
             model=eval_embedding_model,
-            openai_api_key=settings.openai_api_key,
+            openai_api_key=self.settings.openai_api_key,
         )
 
         # Initialize metrics (reference-free only)
@@ -99,7 +101,7 @@ class RAGASEvaluator:
                 "error": None,
             }
 
-            if settings.ragas_log_results:
+            if self.settings.ragas_log_results:
                 logger.info(
                     f"Evaluation completed - "
                     f"faithfulness={scores['faithfulness']}, "

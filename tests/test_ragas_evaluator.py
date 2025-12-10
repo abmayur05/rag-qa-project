@@ -33,6 +33,7 @@ class TestRAGASEvaluator:
         settings.llm_model = "gpt-4o-mini"
         settings.llm_temperature = 0.0
         settings.embedding_model = "text-embedding-3-small"
+        settings.openai_api_key = "test-key"
         settings.ragas_llm_model = "gpt-4o"  # Different model for evaluation
         settings.ragas_llm_temperature = 0.1
         settings.ragas_embedding_model = "text-embedding-3-large"
@@ -44,11 +45,13 @@ class TestRAGASEvaluator:
         mock_llm.assert_called_once_with(
             model="gpt-4o",
             temperature=0.1,
+            openai_api_key="test-key",
         )
 
         # Verify OpenAIEmbeddings was called with RAGAS-specific settings
         mock_embeddings.assert_called_once_with(
             model="text-embedding-3-large",
+            openai_api_key="test-key",
         )
 
     @patch("app.core.ragas_evaluator.ChatOpenAI")
@@ -61,6 +64,7 @@ class TestRAGASEvaluator:
         settings.llm_model = "gpt-4o-mini"
         settings.llm_temperature = 0.0
         settings.embedding_model = "text-embedding-3-small"
+        settings.openai_api_key = "test-key"
         settings.ragas_llm_model = None  # Will fall back to llm_model
         settings.ragas_llm_temperature = None  # Will fall back to llm_temperature
         settings.ragas_embedding_model = None  # Will fall back to embedding_model
@@ -72,11 +76,13 @@ class TestRAGASEvaluator:
         mock_llm.assert_called_once_with(
             model="gpt-4o-mini",
             temperature=0.0,
+            openai_api_key="test-key",
         )
 
         # Verify OpenAIEmbeddings was called with default settings
         mock_embeddings.assert_called_once_with(
             model="text-embedding-3-small",
+            openai_api_key="test-key",
         )
 
     def test_prepare_dataset(self):
