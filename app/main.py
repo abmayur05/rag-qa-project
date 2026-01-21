@@ -100,7 +100,7 @@ app.include_router(query.router)
 async def root():
     """Serve the main UI."""
     index_path = os.path.join(STATIC_DIR, "index.html")
-    with open(index_path, "r") as f:
+    with open(index_path) as f:
         return f.read()
 
 
