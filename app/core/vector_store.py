@@ -39,6 +39,10 @@ def get_qdrant_client() -> QdrantClient:
     return client
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/main
 class VectorStoreService:
     """Service for managing vector store operations."""
 
@@ -206,4 +210,8 @@ class VectorStoreService:
             return True
         except Exception as e:
             logger.error(f"Vector store health check failed: {e}")
+<<<<<<< HEAD
             return False
+=======
+            return False
+>>>>>>> upstream/main

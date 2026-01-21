@@ -126,4 +126,8 @@ async def delete_collection() -> dict:
         raise HTTPException(
             status_code=500,
             detail=f"Error deleting collection: {str(e)}",
+<<<<<<< HEAD
         )
+=======
+        )
+>>>>>>> upstream/main

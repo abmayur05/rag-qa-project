@@ -14,6 +14,10 @@ logger = get_logger(__name__)
 settings = get_settings()
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/main
 # RAG Prompt Template
 RAG_PROMPT_TEMPLATE = """You are a helpful assistant. Answer the question based on the provided context.
 
@@ -41,6 +45,10 @@ def format_docs(docs: list[Document]) -> str:
     return "\n\n---\n\n".join(doc.page_content for doc in docs)
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/main
 class RAGChain:
     """RAG chain for question answering."""
 
@@ -273,4 +281,8 @@ class RAGChain:
                 yield chunk
         except Exception as e:
             logger.error(f"Error streaming query: {e}")
+<<<<<<< HEAD
             raise
+=======
+            raise
+>>>>>>> upstream/main

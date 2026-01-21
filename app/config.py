@@ -60,4 +60,8 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     """Get cached settings instance."""
+<<<<<<< HEAD
     return Settings()
+=======
+    return Settings()
+>>>>>>> upstream/main

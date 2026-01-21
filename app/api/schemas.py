@@ -158,4 +158,8 @@ class ValidationErrorResponse(BaseModel):
 
     error: str = Field(default="Validation Error", description="Error type")
     message: str = Field(..., description="Error message")
+<<<<<<< HEAD
     errors: list[dict] = Field(..., description="Validation errors")
+=======
+    errors: list[dict] = Field(..., description="Validation errors")
+>>>>>>> upstream/main

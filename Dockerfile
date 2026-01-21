@@ -3,7 +3,7 @@
 # ==================================================
 
 # Build stage
-FROM python:3.12-slim AS builder
+FROM python:3.13-slim AS builder
 
 WORKDIR /app
 
@@ -23,7 +23,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 
 # Production stage
-FROM python:3.12-slim AS production
+FROM python:3.13-slim AS production
 
 WORKDIR /app
 
@@ -39,10 +39,8 @@ RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-
-# Copy application code and static files
+# Copy application code
 COPY app/ ./app/
-COPY static/ ./static/
 
 # Set ownership to non-root user
 RUN chown -R appuser:appgroup /app

@@ -57,4 +57,8 @@ class LoggerMixin:
     @property
     def logger(self) -> logging.Logger:
         """Get logger for this class."""
+<<<<<<< HEAD
         return get_logger(self.__class__.__name__)
+=======
+        return get_logger(self.__class__.__name__)
+>>>>>>> upstream/main

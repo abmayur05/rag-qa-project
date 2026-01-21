@@ -71,6 +71,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+<<<<<<< HEAD
 import os
 
 # Create static directory if it doesn't exist
@@ -89,6 +90,10 @@ if not os.path.exists(STATIC_DIR):
 
 # Mount static files
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+=======
+# Mount static files
+#app.mount("/static", StaticFiles(directory="static"), name="static")
+>>>>>>> upstream/main
 
 # Include routers
 app.include_router(health.router)
@@ -96,12 +101,24 @@ app.include_router(documents.router)
 app.include_router(query.router)
 
 
+<<<<<<< HEAD
 @app.get("/", response_class=HTMLResponse, tags=["Root"])
 async def root():
     """Serve the main UI."""
     index_path = os.path.join(STATIC_DIR, "index.html")
     with open(index_path) as f:
         return f.read()
+=======
+
+@app.get("/", tags=["Root"])
+async def root():
+    """Root endpoint."""
+    return {
+        "message": f"Welcome to {settings.app_name}",
+        "version": __version__,
+        "docs": "/docs",
+    }
+>>>>>>> upstream/main
 
 
 @app.exception_handler(Exception)
@@ -127,4 +144,8 @@ if __name__ == "__main__":
         host=settings.api_host,
         port=settings.api_port,
         reload=True,
+<<<<<<< HEAD
     )
+=======
+    )
+>>>>>>> upstream/main
