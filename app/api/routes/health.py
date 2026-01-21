@@ -64,8 +64,4 @@ async def readiness_check() -> ReadinessResponse:
         raise HTTPException(
             status_code=503,
             detail=f"Service not ready: {str(e)}",
-<<<<<<< HEAD
         )
-=======
-        )
->>>>>>> upstream/main

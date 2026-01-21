@@ -180,8 +180,4 @@ async def search_documents(
         raise HTTPException(
             status_code=500,
             detail=f"Error searching documents: {str(e)}",
-<<<<<<< HEAD
         )
-=======
-        )
->>>>>>> upstream/main

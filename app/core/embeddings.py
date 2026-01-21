@@ -60,8 +60,4 @@ class EmbeddingService:
             List of embedding vectors
         """
         logger.debug(f"Generating embeddings for {len(texts)} documents")
-<<<<<<< HEAD
         return self.embeddings.embed_documents(texts)
-=======
-        return self.embeddings.embed_documents(texts)
->>>>>>> upstream/main

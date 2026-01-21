@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-.env
-=======
 # Python
 __pycache__/
 *.py[cod]
@@ -74,4 +71,3 @@ Thumbs.db
 
 
 .claude/*
->>>>>>> upstream/main
