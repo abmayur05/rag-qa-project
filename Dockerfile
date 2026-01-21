@@ -39,8 +39,10 @@ RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Copy application code
+
+# Copy application code and static files
 COPY app/ ./app/
+COPY static/ ./static/
 
 # Set ownership to non-root user
 RUN chown -R appuser:appgroup /app

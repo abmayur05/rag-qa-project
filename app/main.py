@@ -71,8 +71,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+import os
+
+# Create static directory if it doesn't exist
+# We use an absolute path relative to this file's location to ensure it works correctly
+# regardless of where the application is started from.
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+
+if not os.path.exists(STATIC_DIR):
+    os.makedirs(STATIC_DIR, exist_ok=True)
+    # Create a basic index.html if it doesn't exist
+    index_path = os.path.join(STATIC_DIR, "index.html")
+    if not os.path.exists(index_path):
+        with open(index_path, "w") as f:
+            f.write("<html><body><h1>RAG Q&A System</h1></body></html>")
+
 # Mount static files
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 # Include routers
 app.include_router(health.router)
@@ -83,7 +99,8 @@ app.include_router(query.router)
 @app.get("/", response_class=HTMLResponse, tags=["Root"])
 async def root():
     """Serve the main UI."""
-    with open("static/index.html", "r") as f:
+    index_path = os.path.join(STATIC_DIR, "index.html")
+    with open(index_path, "r") as f:
         return f.read()
 
 
