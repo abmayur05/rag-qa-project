@@ -71,29 +71,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-<<<<<<< HEAD
-import os
-
-# Create static directory if it doesn't exist
-# We use an absolute path relative to this file's location to ensure it works correctly
-# regardless of where the application is started from.
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-STATIC_DIR = os.path.join(BASE_DIR, "static")
-
-if not os.path.exists(STATIC_DIR):
-    os.makedirs(STATIC_DIR, exist_ok=True)
-    # Create a basic index.html if it doesn't exist
-    index_path = os.path.join(STATIC_DIR, "index.html")
-    if not os.path.exists(index_path):
-        with open(index_path, "w") as f:
-            f.write("<html><body><h1>RAG Q&A System</h1></body></html>")
-
-# Mount static files
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
-=======
 # Mount static files
 #app.mount("/static", StaticFiles(directory="static"), name="static")
->>>>>>> upstream/main
 
 # Include routers
 app.include_router(health.router)
@@ -101,14 +80,6 @@ app.include_router(documents.router)
 app.include_router(query.router)
 
 
-<<<<<<< HEAD
-@app.get("/", response_class=HTMLResponse, tags=["Root"])
-async def root():
-    """Serve the main UI."""
-    index_path = os.path.join(STATIC_DIR, "index.html")
-    with open(index_path) as f:
-        return f.read()
-=======
 
 @app.get("/", tags=["Root"])
 async def root():
@@ -118,7 +89,6 @@ async def root():
         "version": __version__,
         "docs": "/docs",
     }
->>>>>>> upstream/main
 
 
 @app.exception_handler(Exception)
@@ -138,6 +108,7 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(
         "app.main:app",
         host=settings.api_host,
