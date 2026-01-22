@@ -11,8 +11,8 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  ECR_REPOSITORY: rag-qa-system-hybrid
-  APP_RUNNER_SERVICE: rag-qa-app-hybrid
+  ECR_REPOSITORY: rag-project1
+  APP_RUNNER_SERVICE: rag-project1-app
 
 jobs:
   # ============================================
@@ -77,29 +77,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-<<<<<<< HEAD
-      - name: Deploy to App Runner
-        id: deploy-apprunner
-        uses: awslabs/amazon-app-runner-deploy@main
-        with:
-          service: ${{ env.APP_RUNNER_SERVICE }}
-          image: ${{ needs.build-and-push.outputs.image_uri }}
-          access-role-arn: ${{ secrets.APP_RUNNER_ECR_ACCESS_ROLE_ARN }}
-          region: ${{ env.AWS_REGION }}
-          cpu: 1
-          memory: 2
-          port: 8000
-          wait-for-service-stability-seconds: 300
-          runtime-environment-variables: |
-            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-            QDRANT_URL=${{ secrets.QDRANT_URL }}
-            QDRANT_API_KEY=${{ secrets.QDRANT_API_KEY }}
-            LOG_LEVEL=INFO
-            LANGSMITH_TRACING=true
-            LANGSMITH_API_KEY=${{ secrets.LANGSMITH_API_KEY }}
-            LANGSMITH_PROJECT=rag-qa-production
-            LANGSMITH_ENDPOINT=https://eu.api.smith.langchain.com
-=======
       - name: Check if App Runner service exists
         id: check-service
         run: |
@@ -254,26 +231,15 @@ jobs:
           fi
           echo "service_url=$SERVICE_URL" >> $GITHUB_OUTPUT
           echo "Service URL: $SERVICE_URL"
->>>>>>> upstream/main
 
       - name: Output App Runner URL
         run: |
           echo "🚀 Deployment successful!"
-<<<<<<< HEAD
-          echo "App Runner Service URL: ${{ steps.deploy-apprunner.outputs.service-url }}"
-=======
           echo "App Runner Service URL: https://${{ steps.get-url.outputs.service_url }}"
->>>>>>> upstream/main
 
       - name: Health Check
         run: |
           sleep 30
-<<<<<<< HEAD
-          SERVICE_URL="${{ steps.deploy-apprunner.outputs.service-url }}"
-          echo "Checking health at: https://$SERVICE_URL/health"
-          curl -f "https://$SERVICE_URL/health" || echo "Health check pending..."
-=======
           SERVICE_URL="${{ steps.get-url.outputs.service_url }}"
           echo "Checking health at: https://$SERVICE_URL/health"
           curl -f "https://$SERVICE_URL/health" || echo "Health check pending..."
->>>>>>> upstream/main
